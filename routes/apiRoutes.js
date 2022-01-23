@@ -1,11 +1,11 @@
-const dbStore = require('../db/db.js');
+const dbStore = require('../db/dbStore.js');
 
-const app = require('express').Router();
+const router = require('express').Router();
 
 
 // post notes route
 
-app.post('/notes', (req, res) => {
+router.post('/notes', (req, res) => {
     dbStore
         .addNote(req.body)
         .then(note => {
@@ -19,7 +19,7 @@ app.post('/notes', (req, res) => {
 
 // delete notes route
 
-app.delete('/notes/:id', (req, res) => {
+router.delete('/notes/:id', (req, res) => {
     dbStore
         .removeNote(req.params.id)
         .then(() => {
@@ -32,9 +32,9 @@ app.delete('/notes/:id', (req, res) => {
 
 // get notes route
 
-app.get('/notes', (req, res) => {
+router.get('/notes', (req, res) => {
     dbStore
-        .grabNotes()
+        .getNotes()
         .then(notes => {
             res.json(notes)
         })
@@ -43,4 +43,7 @@ app.get('/notes', (req, res) => {
         })
 })
 
-module.exports = app;
+module.exports = router;
+
+
+

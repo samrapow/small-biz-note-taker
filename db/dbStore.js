@@ -1,44 +1,59 @@
-const util = require("util");
 const fs = require("fs");
+
 const uuid = require("uuid").v1;
 
-const readFileAsync = util.promisify(fs.readFile);
-const writeFileAsync = util.promisify(fs.writeFile);
+const util = require("util");
 
-class Store {
-    read() {
-        return readFileAsync("db/db.json", "utf8")
-    }
+
+const writeFile = util.promisify(fs.writeFile);
+
+const readFile = util.promisify(fs.readFile);
+
+
+class DBInteract {
+
+ 
     write(note) {
-        return writeFileAsync("db/db.json", JSON.stringify(note))
+        return writeFile("db/db.json", JSON.stringify(note))
     }
 
-    addNote(note) {
-        const { title, text } = note
 
-        if (!title || !text) {
-            throw new Error("title and text cannot be blank")
-        }
-
-        const newNote = { title, text, id: uuid() }
-
-        return this.getNotes()
-            .then(notes => [...notes, newNote])
-            .then(updatedNotes => this.write(updatedNotes))
-            .then(() => this.newNote)
+    read() {
+        return readFile("db/db.json", "utf8")
     }
 
-    getNotes() {
+
+    // grab existing notes
+    grabNotes() {
         return this.read()
             .then(notes => {
                 return JSON.parse(notes) || [];
             })
     }
-    removeNote(id) {
-        return this.getNotes()
+
+
+    // create a new note
+    generateNote(note) {
+        const { title, text } = note
+
+        if (!title || !text) {
+            throw new Error("Add a title and/or text to your note, please")
+        }
+
+        const newNote = { title, text, id: uuid() }
+
+        return this.grabNotes()
+            .then(notes => [...notes, newNote])
+            .then(newNotes => this.write(newNotes))
+            .then(() => this.newNote)
+    }
+
+    // delete a note
+    deleteNote(id) {
+        return this.grabNotes()
             .then(notes => notes.filter(note => note.id !== id))
-            .then(keptNotes => this.write(keptNotes))
+            .then(remainingNotes => this.write(remainingNotes))
     }
 }
 
-module.exports = new Store();
+module.exports = new DBInteract();

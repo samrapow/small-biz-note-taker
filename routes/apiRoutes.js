@@ -7,7 +7,7 @@ const router = require('express').Router();
 
 router.post('/notes', (req, res) => {
     dbStore
-        .addNote(req.body)
+        .generateNote(req.body)
         .then(note => {
             res.json(note)
         })
@@ -21,7 +21,7 @@ router.post('/notes', (req, res) => {
 
 router.delete('/notes/:id', (req, res) => {
     dbStore
-        .removeNote(req.params.id)
+        .deleteNote(req.params.id)
         .then(() => {
             res.json({ ok: true})
         })
@@ -34,7 +34,7 @@ router.delete('/notes/:id', (req, res) => {
 
 router.get('/notes', (req, res) => {
     dbStore
-        .getNotes()
+        .grabNotes()
         .then(notes => {
             res.json(notes)
         })
